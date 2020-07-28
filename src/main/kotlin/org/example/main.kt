@@ -25,8 +25,9 @@ import kotlin.random.Random
 
 @InternalCoroutinesApi
 fun main(args: Array<String>) {
+    val writer: PrintWriter = File(args[1]).printWriter()
     when(args[0]) {
-        "semaphore" -> semaphore(args[1].toInt(), args[2].toInt(), args[3].toInt(), args[4].toInt(), args[5].toInt())
-        "splay" -> splay(args[1].toInt(), args[2].toInt())
+        "semaphore" -> semaphore(writer, args[2].toInt(), args[3].toInt(), args[4].toInt(), args[5].toInt(), args[6].toInt())
+        "splay" -> splay(writer, args[2].toInt(), args[3].toInt())
     }
 }

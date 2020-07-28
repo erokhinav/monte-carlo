@@ -6,12 +6,13 @@ import java.io.File
 import java.io.PrintWriter
 import java.util.Random
 
-private val writer: PrintWriter = File("res-splay.csv").printWriter()
+private var writer: PrintWriter = File("res-splay.csv").printWriter()
 val random: Random = Random()
 
 @InternalCoroutinesApi
-fun splay(variance: Int, addPercentage: Int) {
-    writer.println("threads,coroutines,permits,inside,outside,time")
+fun splay(_writer: PrintWriter, variance: Int, addPercentage: Int) {
+    writer = _writer
+    writer.println("variance,percentage,time")
 
     repeat(10) {
         monteCarloIteration(false)

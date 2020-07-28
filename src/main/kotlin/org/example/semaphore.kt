@@ -9,10 +9,11 @@ import java.io.PrintWriter
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
 
-private val writer: PrintWriter = File("res-semaphore.csv").printWriter()
+private var writer: PrintWriter = File("res-semaphore.csv").printWriter()
 
 @InternalCoroutinesApi
-fun semaphore(parallelism: Int, coroutines: Int, maxPermits: Int, workInside: Int, workOutside: Int) {
+fun semaphore(_writer: PrintWriter, parallelism: Int, coroutines: Int, maxPermits: Int, workInside: Int, workOutside: Int) {
+    writer = _writer
     writer.println("threads,coroutines,permits,inside,outside,time")
 
     repeat(10) {
