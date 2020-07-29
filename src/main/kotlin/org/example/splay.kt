@@ -62,7 +62,7 @@ private fun run(print: Boolean, correct: Boolean, variance: Int, addPercentage: 
 }
 
 @InternalCoroutinesApi
-private fun benchmark(tree: SplayTree<Int>, variance: Int, addPercentage: Int) = runBlocking {
+private fun benchmark(tree: SplayTree<Int>, variance: Int, addPercentage: Int) {
     var ans = 0
     repeat(BATCH_SIZE) {
         val key = genGaussianDist(1000, variance)
