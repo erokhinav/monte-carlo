@@ -48,7 +48,7 @@ private fun monteCarloIteration(f: Boolean) {
 
 @InternalCoroutinesApi
 private fun run(print: Boolean, correct: Boolean, variance: Int, addPercentage: Int) {
-    val tree = SplayTree<Int>()
+    val tree = SplayTree(Node(4))
     val startTime = System.nanoTime()
     benchmark(tree, variance, addPercentage)
     val endTime = System.nanoTime()
