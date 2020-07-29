@@ -25,7 +25,7 @@ fun splay(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, variance:
         monteCarloIteration(true)
     }
 
-    repeat(100) {
+    repeat(20) {
         if (variance < 0)
             for (i in 1..VARIANCE_MAX)
                 run(true, true, i, addPercentage)
@@ -78,6 +78,6 @@ private fun genGaussianDist(mean: Int, variance: Int): Int {
     return Math.round(mean + random.nextGaussian() * variance).toInt()
 }
 
-private const val BATCH_SIZE = 1000000
+private const val BATCH_SIZE = 10000
 private const val VARIANCE_MAX = 5000
 private const val PERCENTAGE_MAX = 100
