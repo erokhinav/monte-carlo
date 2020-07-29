@@ -25,11 +25,10 @@ import kotlin.random.Random
 
 @InternalCoroutinesApi
 fun main(args: Array<String>) {
-    val writerMonteCarlo: PrintWriter = File(args[2]).printWriter()
-    val writerCorrect: PrintWriter = File(args[3]).printWriter()
-    val runMonteCarlo = args[0]
-    when(args[1]) {
-        "semaphore" -> semaphore(writerMonteCarlo, writerCorrect, args[4].toInt(), args[5].toInt(), args[6].toInt(), args[7].toInt(), args[8].toInt())
+    val writerMonteCarlo: PrintWriter = File(args[1]).printWriter()
+    val writerCorrect: PrintWriter = File(args[2]).printWriter()
+    when(args[0]) {
+        "semaphore" -> semaphore(writerMonteCarlo, writerCorrect, args[3].toInt(), args[4].toInt(), args[5].toInt(), args[6].toInt(), args[7].toInt())
         "splay" -> splay(writerMonteCarlo, writerCorrect, args[3].toInt(), args[4].toInt())
     }
 }
