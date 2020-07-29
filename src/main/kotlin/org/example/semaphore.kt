@@ -9,42 +9,48 @@ import java.io.PrintWriter
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
 
-private var writer: PrintWriter = File("res-semaphore.csv").printWriter()
+private var writerMonteCarlo: PrintWriter = File("res-semaphore.csv").printWriter()
+private var writerCorrect: PrintWriter = File("res-semaphore.csv").printWriter()
 
 @InternalCoroutinesApi
-fun semaphore(_writer: PrintWriter, parallelism: Int, coroutines: Int, maxPermits: Int, workInside: Int, workOutside: Int) {
-    writer = _writer
-    writer.println("threads,coroutines,permits,inside,outside,time")
+fun semaphore(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, parallelism: Int, coroutines: Int, maxPermits: Int, workInside: Int, workOutside: Int) {
+    writerMonteCarlo = _writerMonteCarlo
+    writerCorrect = _writerCorrect
+    writerMonteCarlo.println("threads,coroutines,permits,inside,outside,time")
+    writerCorrect.println("threads,coroutines,permits,inside,outside,time")
 
     repeat(10) {
         monteCarloIterationSemaphore(false)
     }
 
-    repeat(20000) {
-        monteCarloIterationSemaphore(true)
+//    repeat(20000) {
+//        monteCarloIterationSemaphore(true)
+//    }
+
+    repeat(100) {
+        if (parallelism < 0)
+            for (i in 1..PARALLELISM_MAX)
+                runSemaphore(true, true, i, coroutines, maxPermits, workInside, workOutside)
+
+        if (coroutines < 0)
+            for (i in 1..COROUTINES_MAX)
+                runSemaphore(true, true, parallelism, i, maxPermits, workInside, workOutside)
+
+        if (maxPermits < 0)
+            for (i in 1..PERMITS_MAX)
+                runSemaphore(true, true, parallelism, coroutines, i, workInside, workOutside)
+
+        if (workInside < 0)
+            for (i in 1..WORK_MAX)
+                runSemaphore(true, true, parallelism, coroutines, maxPermits, i, workOutside)
+
+        if (workOutside < 0)
+            for (i in 1..WORK_MAX)
+                runSemaphore(true, true, parallelism, coroutines, maxPermits, workInside, i)
     }
 
-    if (parallelism < 0)
-        for (i in 1..PARALLELISM_MAX)
-            runSemaphore(true, i, coroutines, maxPermits, workInside, workOutside)
-
-    if (coroutines < 0)
-        for (i in 1..COROUTINES_MAX)
-            runSemaphore(true, parallelism, i, maxPermits, workInside, workOutside)
-
-    if (maxPermits < 0)
-        for (i in 1..PERMITS_MAX)
-            runSemaphore(true, parallelism, coroutines, i, workInside, workOutside)
-
-    if (workInside < 0)
-        for (i in 1..WORK_MAX)
-            runSemaphore(true, parallelism, coroutines, maxPermits, i, workOutside)
-
-    if (workOutside < 0)
-        for (i in 1..WORK_MAX)
-            runSemaphore(true, parallelism, coroutines, maxPermits, workInside, i)
-
-    writer.flush()
+    writerMonteCarlo.flush()
+    writerCorrect.flush()
 }
 
 @InternalCoroutinesApi
@@ -63,12 +69,13 @@ fun monteCarloIterationSemaphore(f: Boolean) {
     val maxPermits = Random.nextInt(1, PERMITS_MAX)
     val workInside = Random.nextInt(1, WORK_MAX)
     val workOutside = Random.nextInt(1, WORK_MAX)
-    runSemaphore(f, parallelism, coroutines, maxPermits, workInside, workOutside)
+    runSemaphore(f, false, parallelism, coroutines, maxPermits, workInside, workOutside)
 }
 
 @InternalCoroutinesApi
 fun runSemaphore(
     print: Boolean,
+    correct: Boolean,
     parallelism: Int,
     coroutines: Int,
     maxPermits: Int,
@@ -81,7 +88,10 @@ fun runSemaphore(
     val endTime = System.nanoTime()
     val time = endTime - startTime
     if (print) {
-        writer.println("$parallelism,$coroutines,$maxPermits,$workInside,$workOutside,$time")
+        if (correct)
+            writerCorrect.println("$parallelism,$coroutines,$maxPermits,$workInside,$workOutside,$time")
+        else
+            writerMonteCarlo.println("$parallelism,$coroutines,$maxPermits,$workInside,$workOutside,$time")
     }
     dispatcher.close()
 }

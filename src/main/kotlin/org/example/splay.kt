@@ -6,13 +6,16 @@ import java.io.File
 import java.io.PrintWriter
 import java.util.Random
 
-private var writer: PrintWriter = File("res-splay.csv").printWriter()
+private var writerMonteCarlo: PrintWriter = File("res-splay.csv").printWriter()
+private var writerCorrect: PrintWriter = File("res-splay.csv").printWriter()
 val random: Random = Random()
 
 @InternalCoroutinesApi
-fun splay(_writer: PrintWriter, variance: Int, addPercentage: Int) {
-    writer = _writer
-    writer.println("variance,percentage,time")
+fun splay(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, variance: Int, addPercentage: Int) {
+    writerMonteCarlo = _writerMonteCarlo
+    writerCorrect = _writerCorrect
+    writerMonteCarlo.println("variance,percentage,time")
+    writerCorrect.println("variance,percentage,time")
 
     repeat(10) {
         monteCarloIteration(false)
@@ -22,33 +25,39 @@ fun splay(_writer: PrintWriter, variance: Int, addPercentage: Int) {
         monteCarloIteration(true)
     }
 
-    if (variance < 0)
-        for (i in 1..VARIANCE_MAX)
-            run(true, i, addPercentage)
+    repeat(100) {
+        if (variance < 0)
+            for (i in 1..VARIANCE_MAX)
+                run(true, true, i, addPercentage)
 
-    if (addPercentage < 0)
-        for (i in 1..PERCENTAGE_MAX)
-            run(true, variance, i)
+        if (addPercentage < 0)
+            for (i in 1..PERCENTAGE_MAX)
+                run(true, true, variance, i)
+    }
 
-    writer.flush()
+    writerMonteCarlo.flush()
+    writerCorrect.flush()
 }
 
 @InternalCoroutinesApi
 private fun monteCarloIteration(f: Boolean) {
     val variance = kotlin.random.Random.nextInt(1, VARIANCE_MAX)
     val addPercentage = kotlin.random.Random.nextInt(1, PERCENTAGE_MAX)
-    run(f, variance, addPercentage)
+    run(f, false, variance, addPercentage)
 }
 
 @InternalCoroutinesApi
-private fun run(print: Boolean, variance: Int, addPercentage: Int) {
+private fun run(print: Boolean, correct: Boolean, variance: Int, addPercentage: Int) {
     val tree = SplayTree<Int>()
     val startTime = System.nanoTime()
     benchmark(tree, variance, addPercentage)
     val endTime = System.nanoTime()
     val time = endTime - startTime
     if (print) {
-        writer.println("$variance,$addPercentage,$time")
+        if (correct)
+            writerCorrect.println("$variance,$addPercentage,$time")
+        else
+            writerMonteCarlo.println("$variance,$addPercentage,$time")
     }
 }
 
