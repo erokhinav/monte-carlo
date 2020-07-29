@@ -23,9 +23,9 @@ fun semaphore(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, paral
         monteCarloIterationSemaphore(false)
     }
 
-//    repeat(20000) {
-//        monteCarloIterationSemaphore(true)
-//    }
+    repeat(20000) {
+        monteCarloIterationSemaphore(true)
+    }
 
     repeat(100) {
         if (parallelism < 0)
