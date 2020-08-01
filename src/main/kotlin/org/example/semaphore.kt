@@ -19,7 +19,6 @@ fun semaphore(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, paral
     writerMonteCarlo.println("threads,coroutines,permits,inside,outside,time")
     writerCorrect.println("threads,coroutines,permits,inside,outside,time")
 
-    val dispatcher = ExperimentalCoroutineDispatcher(corePoolSize = parallelism, maxPoolSize = parallelism, idleWorkerKeepAliveNs = Long.MAX_VALUE)
     repeat(10) {
         monteCarloIterationSemaphore(false)
     }
