@@ -19,11 +19,12 @@ fun semaphore(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, paral
     writerMonteCarlo.println("threads,coroutines,permits,inside,outside,time")
     writerCorrect.println("threads,coroutines,permits,inside,outside,time")
 
+    val dispatcher = ExperimentalCoroutineDispatcher(corePoolSize = parallelism, maxPoolSize = parallelism, idleWorkerKeepAliveNs = Long.MAX_VALUE)
     repeat(10) {
         monteCarloIterationSemaphore(false)
     }
 
-    repeat(20000) {
+    repeat(100000) {
         monteCarloIterationSemaphore(true)
     }
 
@@ -82,7 +83,8 @@ fun runSemaphore(
     workInside: Int,
     workOutside: Int
 ) {
-    val dispatcher = ExperimentalCoroutineDispatcher(corePoolSize = parallelism, maxPoolSize = parallelism)
+    val dispatcher = ExperimentalCoroutineDispatcher(corePoolSize = parallelism,
+        maxPoolSize = parallelism, idleWorkerKeepAliveNs = Long.MAX_VALUE)
     val startTime = System.nanoTime()
     semaphoreInternal(dispatcher, coroutines, maxPermits, workInside, workOutside)
     val endTime = System.nanoTime()
