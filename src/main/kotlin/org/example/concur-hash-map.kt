@@ -22,27 +22,27 @@ fun map(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, capacity: I
     writerMonteCarlo.println("capacity,factor,percentage,time")
     writerCorrect.println("capacity,factor,percentage,time")
 
-    repeat(10) {
+    repeat(1) {
         monteCarloIteration(false)
     }
 
-    repeat(20000) {
-        monteCarloIteration(true)
-    }
-
-    repeat(100) {
-        if (capacity < 0)
-            for (i in 1..CAPACITY_MAX)
-                run(true, true, i, (loadFactor / 100.0).toFloat(), addPercentage)
-
-        if (loadFactor < 0)
-            for (i in 1..LOAD_FACTOR_MAX)
-                run(true, true, capacity, (i / 100.0).toFloat(), addPercentage)
-
-        if (addPercentage < 0)
-            for (i in 1..PERCENTAGE_MAX)
-                run(true, true, capacity, (loadFactor / 100.0).toFloat(), i)
-    }
+//    repeat(20000) {
+//        monteCarloIteration(true)
+//    }
+//
+//    repeat(100) {
+//        if (capacity < 0)
+//            for (i in 1..CAPACITY_MAX)
+//                run(true, true, i, (loadFactor / 100.0).toFloat(), addPercentage)
+//
+//        if (loadFactor < 0)
+//            for (i in 1..LOAD_FACTOR_MAX)
+//                run(true, true, capacity, (i / 100.0).toFloat(), addPercentage)
+//
+//        if (addPercentage < 0)
+//            for (i in 1..PERCENTAGE_MAX)
+//                run(true, true, capacity, (loadFactor / 100.0).toFloat(), i)
+//    }
 
     writerMonteCarlo.flush()
     writerCorrect.flush()
@@ -61,6 +61,7 @@ private fun run(print: Boolean, correct: Boolean, capacity: Int, loadFactor: Flo
     val hm = HashMap<Int, Int>(capacity, loadFactor)
     val process = Process(hm)
     process.run()
+//    println(process.totalTime.get())
     if (print) {
         if (correct)
             writerCorrect.println("$capacity,$loadFactor,$addPercentage,${process.totalTime.get()}")
@@ -81,7 +82,7 @@ private class Process(private var mp: HashMap<Int, Int>) {
         repeat(10) {
             executor.submit {
                 onStart()
-                repeat(1000) {
+                repeat(10000) {
 //                    print('!')
                     val key = random.nextInt(1000)
                     val value = random.nextInt(1000)
@@ -95,7 +96,7 @@ private class Process(private var mp: HashMap<Int, Int>) {
             }
         }
 
-        println(1)
+//        println(1)
         while (uninitializedThreads.get() > 0) {
             // wait
             if (yieldInvokedInOnStart.get()) {
@@ -108,11 +109,11 @@ private class Process(private var mp: HashMap<Int, Int>) {
         }
         startTime.set(System.nanoTime())
 
-        while (executor.isTerminated) {
-            executor.awaitTermination(800, TimeUnit.MILLISECONDS)
-        }
-//        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
+//        println("shut")
         executor.shutdown()
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)
+//        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
+//        println("end")
     }
 
     fun onStart() {
