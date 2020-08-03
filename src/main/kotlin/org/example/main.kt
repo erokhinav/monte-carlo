@@ -30,5 +30,6 @@ fun main(args: Array<String>) {
     when(args[0]) {
         "semaphore" -> semaphore(writerMonteCarlo, writerCorrect, args[3].toInt(), args[4].toInt(), args[5].toInt(), args[6].toInt(), args[7].toInt())
         "splay" -> splay(writerMonteCarlo, writerCorrect, args[3].toInt(), args[4].toInt())
+        "map" -> map(writerMonteCarlo, writerCorrect, args[3].toInt(), args[4].toInt(), args[5].toInt())
     }
 }

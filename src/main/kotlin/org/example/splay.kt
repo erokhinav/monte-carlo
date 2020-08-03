@@ -1,14 +1,13 @@
 package org.example
 
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.PrintWriter
 import java.util.Random
 
 private var writerMonteCarlo: PrintWriter = File("res-splay.csv").printWriter()
 private var writerCorrect: PrintWriter = File("res-splay.csv").printWriter()
-val random: Random = Random()
+private val random: Random = Random()
 
 @InternalCoroutinesApi
 fun splay(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, variance: Int, addPercentage: Int) {
