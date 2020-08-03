@@ -22,27 +22,27 @@ fun map(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, capacity: I
     writerMonteCarlo.println("capacity,factor,percentage,time")
     writerCorrect.println("capacity,factor,percentage,time")
 
-    repeat(1) {
+    repeat(10) {
         monteCarloIteration(false)
     }
 
-//    repeat(20000) {
-//        monteCarloIteration(true)
-//    }
-//
-//    repeat(100) {
-//        if (capacity < 0)
-//            for (i in 1..CAPACITY_MAX)
-//                run(true, true, i, (loadFactor / 100.0).toFloat(), addPercentage)
-//
-//        if (loadFactor < 0)
-//            for (i in 1..LOAD_FACTOR_MAX)
-//                run(true, true, capacity, (i / 100.0).toFloat(), addPercentage)
-//
-//        if (addPercentage < 0)
-//            for (i in 1..PERCENTAGE_MAX)
-//                run(true, true, capacity, (loadFactor / 100.0).toFloat(), i)
-//    }
+    repeat(20000) {
+        monteCarloIteration(true)
+    }
+
+    repeat(100) {
+        if (capacity < 0)
+            for (i in 1..CAPACITY_MAX)
+                run(true, true, i, (loadFactor / 100.0).toFloat(), addPercentage)
+
+        if (loadFactor < 0)
+            for (i in 1..LOAD_FACTOR_MAX)
+                run(true, true, capacity, (i / 100.0).toFloat(), addPercentage)
+
+        if (addPercentage < 0)
+            for (i in 1..PERCENTAGE_MAX)
+                run(true, true, capacity, (loadFactor / 100.0).toFloat(), i)
+    }
 
     writerMonteCarlo.flush()
     writerCorrect.flush()
