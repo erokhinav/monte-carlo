@@ -63,9 +63,9 @@ private fun run(print: Boolean, correct: Boolean, capacity: Int, loadFactor: Flo
     process.run()
     if (print) {
         if (correct)
-            writerCorrect.println("$capacity,$loadFactor,$addPercentage,${process.totalTime}")
+            writerCorrect.println("$capacity,$loadFactor,$addPercentage,${process.totalTime.get()}")
         else
-            writerMonteCarlo.println("$capacity,$loadFactor,$addPercentage,${process.totalTime}")
+            writerMonteCarlo.println("$capacity,$loadFactor,$addPercentage,${process.totalTime.get()}")
     }
 }
 
@@ -91,6 +91,7 @@ private class Process(private var mp: HashMap<Int, Int>) {
                     }
                 }
                 totalTime.addAndGet(System.nanoTime() - startTime.get())
+//                println(totalTime.get())
             }
         }
 
