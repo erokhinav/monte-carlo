@@ -96,7 +96,7 @@ private class Process(private var mp: HashMap<Int, Int>) {
             }
         }
 
-//        println(1)
+        println(1)
         while (uninitializedThreads.get() > 0) {
             // wait
             if (yieldInvokedInOnStart.get()) {
