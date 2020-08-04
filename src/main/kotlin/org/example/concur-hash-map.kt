@@ -111,7 +111,9 @@ private class Process(private var mp: HashMap<Int, Int>) {
 
 //        println("shut")
         executor.shutdown()
+        println("start")
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)
+        println("end")
 //        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
 //        println("end")
     }
