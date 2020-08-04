@@ -90,6 +90,7 @@ private class Process(private var mp: HashMap<Int, Int>) {
                         0 -> mp.put(key, value)
                         1 -> mp.get(key)
                     }
+//                    println("key: " + key)
                 }
                 totalTime.addAndGet(System.nanoTime() - startTime.get())
 //                println(totalTime.get())
@@ -110,9 +111,17 @@ private class Process(private var mp: HashMap<Int, Int>) {
         startTime.set(System.nanoTime())
 
 //        println("shut")
-        executor.shutdown()
+//        executor.shutdown()
         println("start")
-        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)
+        executor.shutdown()
+        try {
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow()
+            }
+        } catch (e: InterruptedException) {
+            executor.shutdownNow()
+        }
+//        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)
         println("end")
 //        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
 //        println("end")
