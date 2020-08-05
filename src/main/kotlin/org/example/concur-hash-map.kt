@@ -26,11 +26,11 @@ fun map(_writerMonteCarlo: PrintWriter, _writerCorrect: PrintWriter, capacity: I
         monteCarloIteration(false)
     }
 
-    repeat(20000) {
-        monteCarloIteration(true)
-    }
+//    repeat(20000) {
+//        monteCarloIteration(true)
+//    }
 
-    repeat(100) {
+    repeat(20) {
         if (capacity < 0)
             for (i in 1..CAPACITY_MAX)
                 run(true, true, i, (loadFactor / 100.0).toFloat(), addPercentage)
