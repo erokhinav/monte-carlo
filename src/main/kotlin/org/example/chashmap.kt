@@ -77,7 +77,7 @@ private class Process(private var mp: ConcurrentHashMap<Int, Int>, private var t
     private var spinningTimeBeforeYield = AtomicInteger(1000)
 
     fun run() {
-        repeat(threads) {
+        repeat(32) {
             executor.submit {
                 onStart()
                 repeat(50000) {
