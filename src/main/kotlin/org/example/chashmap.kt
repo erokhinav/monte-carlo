@@ -10,38 +10,37 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.collections.HashMap
 
 private var writer: PrintWriter = File("res-map.csv").printWriter()
 //private var writerCorrect: PrintWriter = File("res-map.csv").printWriter()
 private val random: Random = Random()
 
 @InternalCoroutinesApi
-fun map(_writer: PrintWriter, capacity: Int, loadFactor: Int, addPercentage: Int, all: Boolean) {
+fun map(_writer: PrintWriter, /* capacity: Int,*/ threads: Int, loadFactor: Int, addPercentage: Int, all: Boolean) {
     writer = _writer
-    writer.println("capacity,factor,percentage,time")
+    writer.println("threads,factor,percentage,time")
 
     repeat(10) {
         monteCarloIteration(false)
     }
 
     if (all) {
-        repeat(20000) {
+        repeat(10000) {
             monteCarloIteration(true)
         }
     } else {
-        repeat(20) {
-            if (capacity < 0)
-                for (i in 1..CAPACITY_MAX)
+        repeat(5) {
+            if (threads < 0)
+                for (i in 1..THREADS_MAX)
                     run(true, true, i, (loadFactor / 100.0).toFloat(), addPercentage)
 
             if (loadFactor < 0)
                 for (i in 1..LOAD_FACTOR_MAX)
-                    run(true, true, capacity, (i / 100.0).toFloat(), addPercentage)
+                    run(true, true, threads, (i / 100.0).toFloat(), addPercentage)
 
             if (addPercentage < 0)
                 for (i in 1..PERCENTAGE_MAX)
-                    run(true, true, capacity, (loadFactor / 100.0).toFloat(), i)
+                    run(true, true, threads, (loadFactor / 100.0).toFloat(), i)
         }
     }
 
@@ -50,38 +49,38 @@ fun map(_writer: PrintWriter, capacity: Int, loadFactor: Int, addPercentage: Int
 
 @InternalCoroutinesApi
 private fun monteCarloIteration(f: Boolean) {
-    val capacity = kotlin.random.Random.nextInt(1, CAPACITY_MAX)
+    val threads = kotlin.random.Random.nextInt(1, THREADS_MAX)
     val loadFactor = kotlin.random.Random.nextInt(1, LOAD_FACTOR_MAX)
     val addPercentage = kotlin.random.Random.nextInt(1, PERCENTAGE_MAX)
-    run(f, false, capacity, (loadFactor / 100.0).toFloat(), addPercentage)
+    run(f, false, threads, (loadFactor / 100.0).toFloat(), addPercentage)
 }
 
 @InternalCoroutinesApi
-private fun run(print: Boolean, correct: Boolean, capacity: Int, loadFactor: Float, addPercentage: Int) {
-    val hm = ConcurrentHashMap<Int, Int>(capacity, loadFactor)
-    val process = Process(hm)
+private fun run(print: Boolean, correct: Boolean, threads: Int, loadFactor: Float, addPercentage: Int) {
+    val hm = ConcurrentHashMap<Int, Int>(16, loadFactor)
+    val process = Process(hm, threads)
     process.run()
     if (print) {
         if (correct)
-            writer.println("$capacity,$loadFactor,$addPercentage,${process.totalTime.get()}")
+            writer.println("$threads,$loadFactor,$addPercentage,${process.totalTime.get()}")
         else
-            writer.println("$capacity,$loadFactor,$addPercentage,${process.totalTime.get()}")
+            writer.println("$threads,$loadFactor,$addPercentage,${process.totalTime.get()}")
     }
 }
 
-private class Process(private var mp: ConcurrentHashMap<Int, Int>) {
-    private val executor = Executors.newFixedThreadPool(10)
-    private var uninitializedThreads = AtomicInteger(10)
+private class Process(private var mp: ConcurrentHashMap<Int, Int>, private var threads: Int) {
+    private val executor = Executors.newFixedThreadPool(threads)
+    private var uninitializedThreads = AtomicInteger(threads)
     private var startTime = AtomicLong(-1L)
     var totalTime = AtomicLong(0)
     private var yieldInvokedInOnStart = AtomicBoolean(false)
     private var spinningTimeBeforeYield = AtomicInteger(1000)
 
     fun run() {
-        repeat(10) {
+        repeat(threads) {
             executor.submit {
                 onStart()
-                repeat(10000) {
+                repeat(50000) {
                     val key = random.nextInt(1000)
                     val value = random.nextInt(1000)
                     when (random.nextInt(2)) {
@@ -131,7 +130,7 @@ private class Process(private var mp: ConcurrentHashMap<Int, Int>) {
     }
 }
 
-private const val CAPACITY_MAX = 200
+private const val THREADS_MAX = 32
 private const val LOAD_FACTOR_MAX = 100
 private const val PERCENTAGE_MAX = 100
 private const val MAX_SPINNING_TIME_BEFORE_YIELD = 2_000_000
