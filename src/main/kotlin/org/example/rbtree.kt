@@ -3,14 +3,14 @@ package org.example
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.io.File
 import java.io.PrintWriter
-import java.util.Random
+import java.util.*
 
 private var writer: PrintWriter = File("res-map.csv").printWriter()
 //private var writerCorrect: PrintWriter = File("res-splay.csv").printWriter()
 private val random: Random = Random()
 
 @InternalCoroutinesApi
-fun splay(_writer: PrintWriter, variance: Int, addPercentage: Int, all: Boolean) {
+fun rbtree(_writer: PrintWriter, variance: Int, addPercentage: Int, all: Boolean) {
     writer = _writer
     writer.println("variance,percentage,time")
 
@@ -45,7 +45,8 @@ private fun monteCarloIteration(f: Boolean) {
 
 @InternalCoroutinesApi
 private fun run(print: Boolean, correct: Boolean, variance: Int, addPercentage: Int) {
-    val tree = SplayTree(Node(4))
+//    val tree = SplayTree(Node(4))
+    val tree = TreeMap<Int, Int>()
     val startTime = System.nanoTime()
     benchmark(tree, variance, addPercentage)
     val endTime = System.nanoTime()
@@ -59,14 +60,14 @@ private fun run(print: Boolean, correct: Boolean, variance: Int, addPercentage: 
 }
 
 @InternalCoroutinesApi
-private fun benchmark(tree: SplayTree<Int>, variance: Int, addPercentage: Int) {
+private fun benchmark(tree: TreeMap<Int, Int>, variance: Int, addPercentage: Int) {
     var ans = 0
     repeat(BATCH_SIZE) {
         val key = genGaussianDist(1000, variance)
         if(kotlin.random.Random.nextInt(0, 100) < addPercentage) {
-            tree.add(key)
+            tree.put(key, key)
         } else {
-            ans += tree.find(key)!!.key
+            ans += if (tree.containsKey(key)) tree.get(key)!! else 0
         }
     }
 }

@@ -58,7 +58,7 @@ private fun monteCarloIteration(f: Boolean) {
 @InternalCoroutinesApi
 private fun run(print: Boolean, correct: Boolean, threads: Int, loadFactor: Float, addPercentage: Int) {
     val hm = ConcurrentHashMap<Int, Int>(16, loadFactor)
-    val process = Process(hm, threads)
+    val process = Process(hm, threads, addPercentage)
     process.run()
     if (print) {
         if (correct)
@@ -68,24 +68,27 @@ private fun run(print: Boolean, correct: Boolean, threads: Int, loadFactor: Floa
     }
 }
 
-private class Process(private var mp: ConcurrentHashMap<Int, Int>, private var threads: Int) {
+private class Process(private var mp: ConcurrentHashMap<Int, Int>, private var threads: Int,
+                      private var addPercentage: Int) {
     private val executor = Executors.newFixedThreadPool(threads)
     private var uninitializedThreads = AtomicInteger(threads)
     private var startTime = AtomicLong(-1L)
     var totalTime = AtomicLong(0)
-    private var yieldInvokedInOnStart = AtomicBoolean(false)
-    private var spinningTimeBeforeYield = AtomicInteger(1000)
+//    private var yieldInvokedInOnStart = AtomicBoolean(false)
+//    private var spinningTimeBeforeYield = AtomicInteger(1000)
 
     fun run() {
-        repeat(32) {
+        var i = 0
+        repeat(threads) {
+            ++i
             executor.submit {
                 onStart()
-                repeat(50000) {
+                repeat(TOTAL_OPS / threads + (i < (TOTAL_OPS % threads)).toInt()) {
                     val key = random.nextInt(1000)
                     val value = random.nextInt(1000)
-                    when (random.nextInt(2)) {
-                        0 -> mp.put(key, value)
-                        1 -> mp.get(key)
+                    when (random.nextInt(100) < addPercentage) {
+                        true -> mp.put(key, value)
+                        false -> mp.get(key)
                     }
                 }
                 totalTime.addAndGet(System.nanoTime() - startTime.get())
@@ -94,13 +97,13 @@ private class Process(private var mp: ConcurrentHashMap<Int, Int>, private var t
 
         println(1)
         while (uninitializedThreads.get() > 0) {
-            if (yieldInvokedInOnStart.get()) {
-                spinningTimeBeforeYield.set((spinningTimeBeforeYield.get() + 1) / 2)
-                yieldInvokedInOnStart.set(false)
-            } else {
-                spinningTimeBeforeYield.set((spinningTimeBeforeYield.get() * 2)
-                    .coerceAtMost(MAX_SPINNING_TIME_BEFORE_YIELD))
-            }
+//            if (yieldInvokedInOnStart.get()) {
+//                spinningTimeBeforeYield.set((spinningTimeBeforeYield.get() + 1) / 2)
+//                yieldInvokedInOnStart.set(false)
+//            } else {
+//                spinningTimeBeforeYield.set((spinningTimeBeforeYield.get() * 2)
+//                    .coerceAtMost(MAX_SPINNING_TIME_BEFORE_YIELD))
+//            }
         }
         startTime.set(System.nanoTime())
 
@@ -119,18 +122,21 @@ private class Process(private var mp: ConcurrentHashMap<Int, Int>, private var t
     fun onStart() {
         uninitializedThreads.decrementAndGet() // this thread has finished initialization
         // wait for other threads to start
-        var i = 1
-        while (startTime.get() == -1L) {
-            if (i % spinningTimeBeforeYield.get() == 0) {
-                yieldInvokedInOnStart.set(true)
-                Thread.yield()
-            }
-            i++
-        }
+//        var i = 1
+//        while (startTime.get() == -1L) {
+//            if (i % spinningTimeBeforeYield.get() == 0) {
+//                yieldInvokedInOnStart.set(true)
+//                Thread.yield()
+//            }
+//            i++
+//        }
     }
 }
+
+fun Boolean.toInt() = if (this) 1 else 0
 
 private const val THREADS_MAX = 32
 private const val LOAD_FACTOR_MAX = 100
 private const val PERCENTAGE_MAX = 100
+private const val TOTAL_OPS = 500000
 private const val MAX_SPINNING_TIME_BEFORE_YIELD = 2_000_000
